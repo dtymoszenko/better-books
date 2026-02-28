@@ -1,5 +1,7 @@
 # README
 
+Web app powered by Ruby on Rails backend using WSL for Windows, and ReactJS + Typescript!
+
 This README would normally document whatever steps are necessary to get the
 application up and running.
 
