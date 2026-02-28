@@ -1,0 +1,12 @@
+
+# Ruby / Rails
+/backend/vendor/bundle
+
+# Node / React
+/frontend/node_modules
+
+# Optional common ignores
+/backend/log/*
+/backend/tmp/*
+/backend/.env
+/frontend/.env
