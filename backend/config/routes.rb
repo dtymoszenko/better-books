@@ -1,3 +1,5 @@
 Rails.application.routes.draw do
-  get "/api/health", to: "api/health#index"
+  namespace :api do
+    get "books/search", to: "books#search"
+  end
 end
