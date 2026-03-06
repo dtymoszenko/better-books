@@ -1,14 +1,17 @@
+import { useNavigate } from "react-router-dom";
 import logo from "../../assets/betterBooksImage.webp";
 
 const NAV_ITEMS = [
-  { label: "Placeholder 1" },
-  { label: "Placeholder 2" },
-  { label: "Placeholder 3" },
-  { label: "Placeholder 4" },
-  { label: "Placeholder 5" },
+  { label: "Placeholder 1", path: null },
+  { label: "Placeholder 2", path: null },
+  { label: "Placeholder 3", path: null },
+  { label: "Placeholder 4", path: null },
+  { label: "My Bookshelf", path: "/my-bookshelf" },
 ];
 
 export default function Sidebar() {
+  const navigate = useNavigate();
+
   return (
     <aside style={styles.sidebar}>
       <div style={styles.logoArea}>
@@ -18,7 +21,11 @@ export default function Sidebar() {
 
       <nav style={styles.nav}>
         {NAV_ITEMS.map((item) => (
-          <button key={item.label} style={styles.navItem}>
+          <button
+            key={item.label}
+            style={styles.navItem}
+            onClick={() => item.path && navigate(item.path)}
+          >
             <span style={styles.navLabel}>{item.label}</span>
           </button>
         ))}
