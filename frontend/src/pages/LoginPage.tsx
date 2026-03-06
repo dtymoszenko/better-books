@@ -1,12 +1,14 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { login, saveToken } from "../api/auth";
+import { login as loginApi } from "../api/auth";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -15,8 +17,8 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const { token } = await login(email, password);
-      saveToken(token);
+      const { token, user } = await loginApi(email, password);
+      login(token, user);
       navigate("/");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");

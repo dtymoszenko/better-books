@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { register, saveToken } from "../api/auth";
+import { register as registerApi } from "../api/auth";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -8,6 +9,7 @@ export default function RegisterPage() {
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -21,8 +23,8 @@ export default function RegisterPage() {
     setError(null);
 
     try {
-      const { token } = await register(email, password);
-      saveToken(token);
+      const { token, user } = await registerApi(email, password);
+      login(token, user);
       navigate("/");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed");

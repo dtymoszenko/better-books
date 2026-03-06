@@ -1,18 +1,19 @@
 import { useState, type SubmitEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { searchBooks, type BookSearchResult } from "../api/books";
-import { getToken, removeToken } from "../api/auth";
+import { searchBooks } from "../api/books";
+import { useAuth } from "../contexts/AuthContext";
+import type { BookSearchResult } from "../types";
 
 export default function HomePage() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<BookSearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const isLoggedIn = !!getToken();
+  const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
   function handleLogout() {
-    removeToken();
+    logout();
     navigate("/login");
   }
 
@@ -40,7 +41,7 @@ export default function HomePage() {
     <div style={{ maxWidth: 900, margin: "2rem auto", padding: "0 1rem" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1 style={{ margin: 0 }}>BetterBooks</h1>
-        {isLoggedIn ? (
+        {isAuthenticated ? (
           <button onClick={handleLogout} style={{ padding: "0.4rem 0.9rem", cursor: "pointer" }}>
             Log out
           </button>
