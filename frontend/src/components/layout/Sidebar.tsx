@@ -1,3 +1,5 @@
+import logo from "../../assets/betterBooksImage.webp";
+
 const NAV_ITEMS = [
   { label: "Placeholder 1" },
   { label: "Placeholder 2" },
@@ -10,6 +12,7 @@ export default function Sidebar() {
   return (
     <aside style={styles.sidebar}>
       <div style={styles.logoArea}>
+        <img src={logo} alt="BetterBooks logo" style={styles.logoImage} />
         <span style={styles.logoText}>BetterBooks</span>
       </div>
 
@@ -38,9 +41,15 @@ const styles: Record<string, React.CSSProperties> = {
     height: 56,
     display: "flex",
     alignItems: "center",
+    gap: "0.5rem",
     padding: "0 1.25rem",
     borderBottom: "1px solid #e5e5e5",
     flexShrink: 0,
+  },
+  logoImage: {
+    width: 100,
+    height: 100,
+    objectFit: "contain",
   },
   logoText: {
     fontWeight: 700,
