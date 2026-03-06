@@ -1,117 +1,91 @@
-import { useState, type SubmitEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { searchBooks } from "../api/books";
-import { useAuth } from "../contexts/AuthContext";
-import type { BookSearchResult } from "../types";
+import AppLayout from "../components/layout/AppLayout";
 
-export default function HomePage() {
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<BookSearchResult[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const { isAuthenticated, logout } = useAuth();
-  const navigate = useNavigate();
+const PLACEHOLDER_CARDS = ["Book Title A", "Book Title B", "Book Title C", "Book Title D"];
 
-  function handleLogout() {
-    logout();
-    navigate("/login");
-  }
-
-  async function handleSearch(e: SubmitEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    const trimmed = query.trim();
-    if (!trimmed) return;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const data = await searchBooks(trimmed);
-      setResults(data.results || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
-  }
-
+function PlaceholderCard({ label }: { label: string }) {
   return (
-    <div style={{ maxWidth: 900, margin: "2rem auto", padding: "0 1rem" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h1 style={{ margin: 0 }}>BetterBooks</h1>
-        {isAuthenticated ? (
-          <button onClick={handleLogout} style={{ padding: "0.4rem 0.9rem", cursor: "pointer" }}>
-            Log out
-          </button>
-        ) : (
-          <Link to="/login" style={{ padding: "0.4rem 0.9rem", textDecoration: "none", border: "1px solid #ccc", borderRadius: 6 }}>
-            Sign in
-          </Link>
-        )}
-      </div>
-      <p>Search books through Google Books API</p>
-
-      <form onSubmit={handleSearch} style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search for a book (e.g. The Hobbit)"
-          style={{ flex: 1, padding: "0.6rem" }}
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? "Searching..." : "Search"}
-        </button>
-      </form>
-
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
-
-      <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-        {results.map((book) => (
-          <li
-            key={book.google_books_id}
-            style={{
-              display: "flex",
-              gap: "1rem",
-              padding: "0.75rem 0",
-              borderBottom: "1px solid #ddd"
-            }}
-          >
-            <div style={{ width: 80, flexShrink: 0 }}>
-              {book.thumbnail ? (
-                <img
-                  src={book.thumbnail}
-                  alt={book.title ?? "Book cover"}
-                  style={{ width: 80, height: "auto" }}
-                />
-              ) : (
-                <div style={{ width: 80, height: 120, background: "#eee" }} />
-              )}
-            </div>
-
-            <div>
-              <h3 style={{ margin: 0 }}>{book.title ?? "Untitled"}</h3>
-
-              <p style={{ margin: "0.25rem 0" }}>
-                {book.authors.length ? book.authors.join(", ") : "Unknown author"}
-              </p>
-
-              <p style={{ margin: "0.25rem 0", color: "#666" }}>
-                {book.published_date ?? "Unknown year"}
-              </p>
-
-              {book.description && (
-                <p style={{ marginTop: "0.5rem" }}>
-                  {book.description.slice(0, 220)}
-                  {book.description.length > 220 ? "..." : ""}
-                </p>
-              )}
-            </div>
-          </li>
-        ))}
-      </ul>
+    <div style={styles.card}>
+      <div style={styles.cardCover} />
+      <div style={styles.cardLabel}>{label}</div>
+      <div style={styles.cardMeta}>Author placeholder</div>
     </div>
   );
 }
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section style={styles.section}>
+      <h2 style={styles.sectionTitle}>{title}</h2>
+      {children}
+    </section>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <AppLayout title="Home">
+      <Section title="Currently Reading">
+        <div style={styles.cardRow}>
+          {PLACEHOLDER_CARDS.slice(0, 2).map((label) => (
+            <PlaceholderCard key={label} label={label} />
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Want to Read">
+        <div style={styles.cardRow}>
+          {PLACEHOLDER_CARDS.map((label) => (
+            <PlaceholderCard key={label} label={label} />
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Recently Finished">
+        <div style={styles.cardRow}>
+          {PLACEHOLDER_CARDS.slice(0, 3).map((label) => (
+            <PlaceholderCard key={label} label={label} />
+          ))}
+        </div>
+      </Section>
+    </AppLayout>
+  );
+}
+
+const styles: Record<string, React.CSSProperties> = {
+  section: {
+    marginBottom: "2rem",
+  },
+  sectionTitle: {
+    fontSize: "1rem",
+    fontWeight: 600,
+    margin: "0 0 0.875rem",
+    color: "#111",
+  },
+  cardRow: {
+    display: "flex",
+    gap: "1rem",
+    flexWrap: "wrap",
+  },
+  card: {
+    width: 140,
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.4rem",
+    cursor: "pointer",
+  },
+  cardCover: {
+    width: 140,
+    height: 200,
+    background: "#e0e0e0",
+    borderRadius: 6,
+  },
+  cardLabel: {
+    fontSize: "0.875rem",
+    fontWeight: 600,
+    color: "#111",
+  },
+  cardMeta: {
+    fontSize: "0.8rem",
+    color: "#666",
+  },
+};
