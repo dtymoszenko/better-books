@@ -1,25 +1,31 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { login, saveToken } from "../api/auth";
+import { register, saveToken } from "../api/auth";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (password !== confirm) {
+      setError("Passwords do not match");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      const { token } = await login(email, password);
+      const { token } = await register(email, password);
       saveToken(token);
       navigate("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      setError(err instanceof Error ? err.message : "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -29,7 +35,7 @@ export default function LoginPage() {
     <div style={styles.page}>
       <div style={styles.card}>
         <h1 style={styles.logo}>BetterBooks</h1>
-        <p style={styles.subtitle}>Sign in to your account</p>
+        <p style={styles.subtitle}>Create your account</p>
 
         {error && <p style={styles.error}>{error}</p>}
 
@@ -54,6 +60,19 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="Min. 8 characters"
+              required
+              style={styles.input}
+            />
+          </div>
+
+          <div style={styles.field}>
+            <label htmlFor="confirm" style={styles.label}>Confirm password</label>
+            <input
+              id="confirm"
+              type="password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
               placeholder="••••••••"
               required
               style={styles.input}
@@ -61,13 +80,13 @@ export default function LoginPage() {
           </div>
 
           <button type="submit" disabled={loading} style={styles.button}>
-            {loading ? "Signing in..." : "Sign in"}
+            {loading ? "Creating account..." : "Sign up"}
           </button>
         </form>
 
         <p style={styles.footer}>
-          Don't have an account?{" "}
-          <Link to="/register" style={styles.link}>Sign up</Link>
+          Already have an account?{" "}
+          <Link to="/login" style={styles.link}>Sign in</Link>
         </p>
       </div>
     </div>

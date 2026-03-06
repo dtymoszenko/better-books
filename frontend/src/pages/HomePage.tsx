@@ -1,11 +1,20 @@
 import { useState, type SubmitEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { searchBooks, type BookSearchResult } from "../api/books";
+import { getToken, removeToken } from "../api/auth";
 
 export default function HomePage() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<BookSearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const isLoggedIn = !!getToken();
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    removeToken();
+    navigate("/login");
+  }
 
   async function handleSearch(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -29,7 +38,18 @@ export default function HomePage() {
 
   return (
     <div style={{ maxWidth: 900, margin: "2rem auto", padding: "0 1rem" }}>
-      <h1>BetterBooks</h1>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h1 style={{ margin: 0 }}>BetterBooks</h1>
+        {isLoggedIn ? (
+          <button onClick={handleLogout} style={{ padding: "0.4rem 0.9rem", cursor: "pointer" }}>
+            Log out
+          </button>
+        ) : (
+          <Link to="/login" style={{ padding: "0.4rem 0.9rem", textDecoration: "none", border: "1px solid #ccc", borderRadius: 6 }}>
+            Sign in
+          </Link>
+        )}
+      </div>
       <p>Search books through Google Books API</p>
 
       <form onSubmit={handleSearch} style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
